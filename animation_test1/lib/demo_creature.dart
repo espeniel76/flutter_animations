@@ -109,7 +109,7 @@ class CreaturePainter extends CustomPainter {
   static const halfPi = math.pi / 2;
   static const twoPi = math.pi * 2;
 
-  final n = 200;
+  final n = 300;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -119,35 +119,34 @@ class CreaturePainter extends CustomPainter {
     final q = twoPi * index / count;
     canvas.translate(halfWidth, halfHeight);
 
-    // 추가 될때 각도
     if (index > 0 && count > 2) {
-      // 추가를 스무스하게 넘길 때
-      canvas.rotate(twoPi * (index / (count - 1)) * (count - addAnimation.value) / count);
+      num rotate = twoPi * (index / (count - 1)) * (count - addAnimation.value) / count;
+      canvas.rotate(rotate);
     } else {
       canvas.rotate(q);
     }
 
-    List<Offset> computeOffsets(int length) {
-      final offsets = <Offset>[];
-      for (var i = 0; i < n; i++) {
-        final qq = i / (n - 1);
-        final r = map(math.cos(twoPi * qq), 1, -1, 0, 42) * math.sqrt(qq);
-        // final r = map(math.cos(twoPi * qq), 1, -1, 0, 42);
-        final th = 12 * twoPi * qq - 4 * twoPi * t - q;
-        final x = r * math.cos(th);
-        final y = -(halfWidth - 10) * qq + r * math.sin(th);
-        final tw = math.pi / 10 * math.sin(twoPi * t - math.pi * qq);
-        final xx = x * math.cos(tw) + y * math.sin(tw);
-        final yy = y * math.cos(tw) - x * math.sin(tw);
-        offsets.add(Offset(xx, yy));
-      }
-      return offsets;
+    // List<Offset> computeOffsets(int length) {
+    final offsets = <Offset>[];
+    for (var i = 0; i < n; i++) {
+      final qq = i / (n - 1);
+      final r = map(math.cos(twoPi * qq), 1, -1, 0, 42) * math.sqrt(qq);
+      final th = 12 * twoPi * qq - 4 * twoPi * t - q;
+      final x = r * math.cos(th);
+      final y = -(halfWidth - 10) * qq + r * math.sin(th);
+      final tw = math.pi / 10 * math.sin(twoPi * t - math.pi * qq);
+      final xx = x * math.cos(tw) + y * math.sin(tw);
+      final yy = y * math.cos(tw) - x * math.sin(tw);
+      offsets.add(Offset(xx, yy));
     }
+    // final offsets;
+    // }
 
-    final offsets = computeOffsets(count);
+    // final offsets = computeOffsets(count);
 
     final path = Path()..addPolygon(offsets, false);
-    // print(path.getBounds());
+
+    // 마침내 그린다
     canvas.drawPath(
       path,
       Paint()
