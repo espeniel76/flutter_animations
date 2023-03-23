@@ -21,13 +21,13 @@ class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProvider
     int radius = 120;
 
     List<Offset> offsets = initRound(radius);
-    Path path1 = createRandomPath(radius, offsets, 1);
-    Path path2 = createRandomPath(radius, offsets, 1);
+    Path path1 = createRandomPath(radius, offsets, 5);
+    Path path2 = createRandomPath(radius, offsets, 5);
     data1 = PathMorph.samplePaths(path1, path2);
 
-    path1 = createRandomPath(radius, offsets, 2);
-    path2 = createRandomPath(radius, offsets, 2);
-    data2 = PathMorph.samplePaths(path1, path2);
+    // path1 = createRandomPath(radius, offsets, 10);
+    // path2 = createRandomPath(radius, offsets, 10);
+    // data2 = PathMorph.samplePaths(path1, path2);
 
     controller = AnimationController(
       vsync: this,
@@ -36,7 +36,7 @@ class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProvider
     );
 
     PathMorph.generateAnimations(controller, data1, func);
-    PathMorph.generateAnimations(controller, data2, func);
+    // PathMorph.generateAnimations(controller, data2, func);
 
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -51,7 +51,7 @@ class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProvider
   void func(int i, Offset z) {
     setState(() {
       data1.shiftedPoints[i] = z;
-      data2.shiftedPoints[i] = z;
+      // data2.shiftedPoints[i] = z;
     });
   }
 
@@ -70,13 +70,13 @@ class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProvider
             ),
           ),
         ),
-        Positioned.fill(
-          child: CustomPaint(
-            painter: MyPainter(
-              PathMorph.generatePath(data2),
-            ),
-          ),
-        )
+        // Positioned.fill(
+        //   child: CustomPaint(
+        //     painter: MyPainter(
+        //       PathMorph.generatePath(data2),
+        //     ),
+        //   ),
+        // )
       ]),
     );
   }
@@ -91,10 +91,10 @@ class MyPainter extends CustomPainter {
   MyPainter(this.path) {
     myPaint = Paint()
       ..blendMode = BlendMode.lighten
-      ..color = Colors.white.withAlpha(150)
+      ..color = Colors.white.withAlpha(200)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.0
-      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 7);
+      ..strokeWidth = 3.0
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 5);
   }
 
   @override
@@ -122,8 +122,9 @@ Path createRandomPath(int radius, List<Offset> offsetsRef, int cntRnd) {
     int rndPoint = Math.Random().nextInt(offsets.length - 1);
     // int rndPoint = 100;
     // 해당포인트의 x, y 좌표를 다시 구한다.
-    double x = double.parse(((radius + 10) * Math.cos(toRadians(rndPoint))).toStringAsFixed(3));
-    double y = double.parse(((radius + 10) * Math.sin(toRadians(rndPoint))).toStringAsFixed(3));
+    double x = double.parse(((radius + 15) * Math.cos(toRadians(rndPoint))).toStringAsFixed(3));
+    double y = double.parse(((radius + 1
+        5) * Math.sin(toRadians(rndPoint))).toStringAsFixed(3));
     // 구한 좌표를 재 할당한다.
     offsets[rndPoint] = Offset(x, y);
     rndPoints.add(rndPoint);
@@ -135,7 +136,7 @@ Path createRandomPath(int radius, List<Offset> offsetsRef, int cntRnd) {
 
     // 앞으로 20칸
     int add = 0;
-    int nForward = 10;
+    int nForward = 5;
     for (int k = rndNow + 1; k <= rndNow + nForward; k++) {
       add++;
       double x = double.parse(((radius + (nForward - add)) * Math.cos(toRadians(k))).toStringAsFixed(3));
@@ -144,7 +145,7 @@ Path createRandomPath(int radius, List<Offset> offsetsRef, int cntRnd) {
     }
     // 뒤로 20칸
     add = 0;
-    int nReward = 10;
+    int nReward = 5;
     for (int k = rndNow - 1; k > rndNow - nReward; k--) {
       add--;
       double x = double.parse(((radius + (nReward + add)) * Math.cos(toRadians(k))).toStringAsFixed(3));
