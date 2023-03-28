@@ -9,37 +9,50 @@ class MorphPathTest extends StatefulWidget {
   State<MorphPathTest> createState() => _MorphPathTestState();
 }
 
-class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProviderStateMixin {
-  SampledPathData data1;
-  SampledPathData data2;
+class _MorphPathTestState extends State<MorphPathTest> with TickerProviderStateMixin {
+  SampledPathData _data;
+
   AnimationController controller;
+  AnimationController controllerRotate;
+
+  int radius = 130; // 반지름
+  int rndMax = 30;
+  double rndRotate = (Math.Random().nextInt(330)).toDouble();
 
   @override
   void initState() {
     super.initState();
 
-    int radius = 100; // 반지름
-    int curve = 1; // 곡면
-    int cntRnd = 0; // 랜덤 생성 비율
-    int rndHeight = 20; // 랜덤 높이
+    // 로테이션 애니메이션
+    controllerRotate = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 20),
+      animationBehavior: AnimationBehavior.normal,
+    );
+    controllerRotate.forward();
+    controllerRotate.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controllerRotate.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        controllerRotate.forward();
+      }
+    });
 
-    // 해당 원 크기에 따른 좌표 정보 셋팅
-    // List<Offset> offsets = initRound(radius, curve);
-
-    // Path path1 = createRandomPath(radius, offsets, curve, cntRnd, rndHeight);
-    // Path path2 = createRandomPath(radius, offsets, curve, cntRnd, rndHeight);
-    Path path1 = initRound(radius);
-    Path path2 = initRound(radius);
-    data1 = PathMorph.samplePaths(path1, path2);
-
+    // 원 굴곡 애니메이션
+    Path path1 = initRound(radius, 5, rndMax);
+    Path path2 = initRound(radius, 5, rndMax);
+    _data = PathMorph.samplePaths(path1, path2);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
-      animationBehavior: AnimationBehavior.preserve,
+      duration: Duration(seconds: 2),
+      animationBehavior: AnimationBehavior.normal,
     );
-
-    PathMorph.generateAnimations(controller, data1, func);
-
+    PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+      setState(() {
+        _data.shiftedPoints[i] = z;
+      });
+    });
+    controller.forward();
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         controller.reverse();
@@ -47,47 +60,133 @@ class _MorphPathTestState extends State<MorphPathTest> with SingleTickerProvider
         controller.forward();
       }
     });
-    controller.forward();
   }
 
-  void func(int i, Offset z) {
-    setState(() {
-      data1.shiftedPoints[i] = z;
-    });
+  @override
+  void dispose() {
+    controller.dispose();
+    controllerRotate.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('타이틀'),
-      ),
-      backgroundColor: Colors.black,
-      body: Stack(children: [
-        Positioned.fill(
-          child: CustomPaint(
-            painter: MyPainter(
-              PathMorph.generatePath(data1),
+        appBar: AppBar(
+          title: const Text('Round Wave'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Path path1 = initRound(radius, 0, 10);
+                Path path2 = initRound(radius, 0, 10);
+                setState(() {
+                  _data = PathMorph.samplePaths(path1, path2);
+                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                    setState(() {
+                      _data.shiftedPoints[i] = z;
+                    });
+                  });
+                });
+                controller.addStatusListener((status) {
+                  if (status == AnimationStatus.completed) {
+                    controller.reverse();
+                  } else if (status == AnimationStatus.dismissed) {
+                    controller.forward();
+                  }
+                });
+                controller.forward();
+              },
+              child: Text('1'),
+              style: _btnStyle(),
             ),
-          ),
+            ElevatedButton(
+              onPressed: () {
+                Path path1 = initRound(radius, 0, 40);
+                Path path2 = initRound(radius, 0, 40);
+                setState(() {
+                  _data = PathMorph.samplePaths(path1, path2);
+                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                    setState(() {
+                      _data.shiftedPoints[i] = z;
+                    });
+                  });
+                });
+                controller.addStatusListener((status) {
+                  if (status == AnimationStatus.completed) {
+                    controller.reverse();
+                  } else if (status == AnimationStatus.dismissed) {
+                    controller.forward();
+                  }
+                });
+                controller.forward();
+              },
+              child: Text('2'),
+              style: _btnStyle(),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Path path1 = initRound(radius, 0, 80);
+                Path path2 = initRound(radius, 0, 80);
+                setState(() {
+                  _data = PathMorph.samplePaths(path1, path2);
+                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                    setState(() {
+                      _data.shiftedPoints[i] = z;
+                    });
+                  });
+                });
+                controller.addStatusListener((status) {
+                  if (status == AnimationStatus.completed) {
+                    controller.reverse();
+                  } else if (status == AnimationStatus.dismissed) {
+                    controller.forward();
+                  }
+                });
+                controller.forward();
+              },
+              child: Text('3'),
+              style: _btnStyle(),
+            ),
+          ],
         ),
-      ]),
-    );
+        backgroundColor: Colors.black,
+        body: RotationTransition(
+          turns: Tween(begin: 0.0, end: 1.0).animate(controllerRotate),
+          child: Stack(children: [
+            Positioned.fill(
+                child:
+                    CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 0, Colors.white, 200, 4))),
+            Positioned.fill(
+                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 30, Colors.white, 70, 2))),
+            Positioned.fill(
+                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 60, Colors.white, 40, 2))),
+            Positioned.fill(
+                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 120, Colors.white, 90, 2))),
+            Positioned.fill(
+                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 150, Colors.white, 120, 2))),
+          ]),
+        ));
   }
 }
 
 class MyPainter extends CustomPainter {
   Path path;
+  int radius;
+  double rndRotate;
+  Color color;
+  int alpha;
+  double strokeWidth;
+
   var myPaint;
   double halfWidth = 0;
   double halfHeight = 0;
 
-  MyPainter(this.path) {
+  MyPainter(this.path, this.radius, this.rndRotate, this.color, this.alpha, this.strokeWidth) {
     myPaint = Paint()
       ..blendMode = BlendMode.lighten
-      ..color = Colors.yellow.withAlpha(200)
+      ..color = color.withAlpha(alpha)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.0
+      ..strokeWidth = strokeWidth
       ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 10);
   }
 
@@ -95,12 +194,10 @@ class MyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (halfWidth == 0) {
       halfWidth = size.width / 2;
-      halfHeight = size.height / 2;
+      halfHeight = (size.height / 2) - radius / 2;
     }
     canvas.translate(halfWidth, halfHeight);
-    // path.moveTo(100, 0);
-    // path.relativeCubicTo(0, 0, 0, 0, -100, 100);
-
+    canvas.rotate(rndRotate);
     canvas.drawPath(path, myPaint);
   }
 
@@ -108,70 +205,43 @@ class MyPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
-Path createRandomPath(int radius, List<Offset> offsetsRef, int curve, int cntRnd, int height) {
-  List<Offset> offsets = List.of(offsetsRef);
-  double x = 0;
-  double y = 0;
-
-  for (num i = 0; i < cntRnd; i++) {
-    int rndNum = Math.Random().nextInt(offsets.length - 1);
-    // int rndNum = 20;
-    int rndPoint = rndNum * curve;
-    x = getCos(radius + height, rndPoint);
-    y = getSin(radius + height, rndPoint);
-    offsets[rndNum + 1] = Offset(x, y);
-  }
-
-  // 랜덤 포인트 주위 값들 보정..v
-
+Path initRound(int radius, int min, int max) {
   Path path = Path();
-  path.moveTo(offsets[0].dx, 0);
-  for (num i = 1; i < offsets.length; i++) {
-    path.lineTo(offsets[i].dx, offsets[i].dy);
-  }
-  return path;
-}
-
-Path initRound(int radius) {
-  Path path = Path();
-  path.moveTo(0, -100);
+  path.moveTo(0, -(radius.toDouble()));
 
   double length = radius.toDouble();
 
-  int min = 15;
-  int max = 40;
   int rndNum = min + Math.Random().nextInt(max - min);
-  double rndNum4 = 5;
-  double x1 = ((length / 5) * 5) + rndNum;
+  double x1 = length + rndNum;
   double y1 = 0;
   double x2 = length;
-  double y2 = ((length / 5) * 5) + rndNum;
+  double y2 = length - rndNum;
   double x3 = length;
   double y3 = length;
   path.relativeCubicTo(x1, y1, x2, y2, x3, y3);
 
   rndNum = min + Math.Random().nextInt(max - min);
   x1 = 0;
-  y1 = ((length / 5) * 5) + rndNum;
-  x2 = -((length / 5) * 5) + rndNum;
+  y1 = length + rndNum;
+  x2 = -length + rndNum;
   y2 = length;
   x3 = -length;
   y3 = length;
   path.relativeCubicTo(x1, y1, x2, y2, x3, y3);
 
   rndNum = min + Math.Random().nextInt(max - min);
-  x1 = -((length / 5) * 5) + rndNum;
+  x1 = -length - (rndNum);
   y1 = 0;
   x2 = -length;
-  y2 = -((length / 5) * 5) + rndNum;
+  y2 = -length + rndNum;
   x3 = -length;
   y3 = -length;
   path.relativeCubicTo(x1, y1, x2, y2, x3, y3);
 
   rndNum = min + Math.Random().nextInt(max - min);
   x1 = 0;
-  y1 = -((length / 5) * 5) + rndNum;
-  x2 = (length / 5) * 5 + rndNum;
+  y1 = -length - rndNum;
+  x2 = length - rndNum;
   y2 = -length;
   x3 = length;
   y3 = -length;
@@ -181,27 +251,16 @@ Path initRound(int radius) {
   return path;
 }
 
-// List<Offset> initRound(int radius, int curve) {
-//   double x = 0;
-//   double y = 0;
-//   var offsets = <Offset>[];
-//   offsets.add(Offset(radius.toDouble(), y));
-//   for (num i = 0; i <= 360; i += curve) {
-//     x = getCos(radius, i);
-//     y = getSin(radius, i);
-//     offsets.add(Offset(x, y));
-//   }
-//   return offsets;
-// }
-
-double getSin(int radius, int arcDegree) {
-  return double.parse(((radius) * Math.sin(toRadians(arcDegree))).toStringAsFixed(3));
-}
-
-double getCos(int radius, int arcDegree) {
-  return double.parse(((radius) * Math.cos(toRadians(arcDegree))).toStringAsFixed(3));
-}
-
-double toRadians(num degrees) {
-  return degrees * (Math.pi / 180);
+ButtonStyle _btnStyle() {
+  return ButtonStyle(
+    padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0)),
+    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+    backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+        side: BorderSide(color: Colors.red),
+      ),
+    ),
+  );
 }
