@@ -15,7 +15,7 @@ class _MorphPathTestState extends State<MorphPathTest> with TickerProviderStateM
   AnimationController controller;
   AnimationController controllerRotate;
 
-  int radius = 130; // 반지름
+  int radius = 110; // 반지름
   int rndMax = 30;
   double rndRotate = (Math.Random().nextInt(330)).toDouble();
 
@@ -39,12 +39,12 @@ class _MorphPathTestState extends State<MorphPathTest> with TickerProviderStateM
     });
 
     // 원 굴곡 애니메이션
-    Path path1 = initRound(radius, 5, rndMax);
-    Path path2 = initRound(radius, 5, rndMax);
+    Path path1 = initRound(radius, 1, rndMax);
+    Path path2 = initRound(radius, 1, rndMax);
     _data = PathMorph.samplePaths(path1, path2);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: Duration(milliseconds: 1000),
       animationBehavior: AnimationBehavior.normal,
     );
     PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
@@ -71,101 +71,107 @@ class _MorphPathTestState extends State<MorphPathTest> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Round Wave'),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Path path1 = initRound(radius, 0, 10);
-                Path path2 = initRound(radius, 0, 10);
-                setState(() {
-                  _data = PathMorph.samplePaths(path1, path2);
-                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
-                    setState(() {
-                      _data.shiftedPoints[i] = z;
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.fitHeight,
+          image: AssetImage('assets/night-sky-g7048d4583_1920.jpg')
+        )
+      ),
+      child: Scaffold(
+          backgroundColor: Colors.black.withOpacity(0.6),
+          appBar: AppBar(
+            title: const Text('Round Wave'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Path path1 = initRound(radius, 0, 10);
+                  Path path2 = initRound(radius, 0, 10);
+                  setState(() {
+                    _data = PathMorph.samplePaths(path1, path2);
+                    PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                      setState(() {
+                        _data.shiftedPoints[i] = z;
+                      });
                     });
                   });
-                });
-                controller.addStatusListener((status) {
-                  if (status == AnimationStatus.completed) {
-                    controller.reverse();
-                  } else if (status == AnimationStatus.dismissed) {
-                    controller.forward();
-                  }
-                });
-                controller.forward();
-              },
-              child: Text('1'),
-              style: _btnStyle(),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Path path1 = initRound(radius, 0, 40);
-                Path path2 = initRound(radius, 0, 40);
-                setState(() {
-                  _data = PathMorph.samplePaths(path1, path2);
-                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
-                    setState(() {
-                      _data.shiftedPoints[i] = z;
+                  controller.addStatusListener((status) {
+                    if (status == AnimationStatus.completed) {
+                      controller.reverse();
+                    } else if (status == AnimationStatus.dismissed) {
+                      controller.forward();
+                    }
+                  });
+                  controller.forward();
+                },
+                child: Text('1'),
+                style: _btnStyle(),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Path path1 = initRound(radius, 0, 30);
+                  Path path2 = initRound(radius, 0, 30);
+                  setState(() {
+                    _data = PathMorph.samplePaths(path1, path2);
+                    PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                      setState(() {
+                        _data.shiftedPoints[i] = z;
+                      });
                     });
                   });
-                });
-                controller.addStatusListener((status) {
-                  if (status == AnimationStatus.completed) {
-                    controller.reverse();
-                  } else if (status == AnimationStatus.dismissed) {
-                    controller.forward();
-                  }
-                });
-                controller.forward();
-              },
-              child: Text('2'),
-              style: _btnStyle(),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Path path1 = initRound(radius, 0, 80);
-                Path path2 = initRound(radius, 0, 80);
-                setState(() {
-                  _data = PathMorph.samplePaths(path1, path2);
-                  PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
-                    setState(() {
-                      _data.shiftedPoints[i] = z;
+                  controller.addStatusListener((status) {
+                    if (status == AnimationStatus.completed) {
+                      controller.reverse();
+                    } else if (status == AnimationStatus.dismissed) {
+                      controller.forward();
+                    }
+                  });
+                  controller.forward();
+                },
+                child: Text('2'),
+                style: _btnStyle(),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Path path1 = initRound(radius, 0, 60);
+                  Path path2 = initRound(radius, 0, 60);
+                  setState(() {
+                    _data = PathMorph.samplePaths(path1, path2);
+                    PathMorph.generateAnimations(controller, _data, (int i, Offset z) {
+                      setState(() {
+                        _data.shiftedPoints[i] = z;
+                      });
                     });
                   });
-                });
-                controller.addStatusListener((status) {
-                  if (status == AnimationStatus.completed) {
-                    controller.reverse();
-                  } else if (status == AnimationStatus.dismissed) {
-                    controller.forward();
-                  }
-                });
-                controller.forward();
-              },
-              child: Text('3'),
-              style: _btnStyle(),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.black,
-        body: RotationTransition(
-          turns: Tween(begin: 0.0, end: 1.0).animate(controllerRotate),
-          child: Stack(children: [
-            Positioned.fill(
-                child:
-                    CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 0, Colors.white, 200, 4))),
-            Positioned.fill(
-                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 30, Colors.white, 70, 2))),
-            Positioned.fill(
-                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 60, Colors.white, 40, 2))),
-            Positioned.fill(
-                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 120, Colors.white, 90, 2))),
-            Positioned.fill(
-                child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 150, Colors.white, 120, 2))),
-          ]),
-        ));
+                  controller.addStatusListener((status) {
+                    if (status == AnimationStatus.completed) {
+                      controller.reverse();
+                    } else if (status == AnimationStatus.dismissed) {
+                      controller.forward();
+                    }
+                  });
+                  controller.forward();
+                },
+                child: Text('3'),
+                style: _btnStyle(),
+              ),
+            ],
+          ),
+          body: RotationTransition(
+            turns: Tween(begin: 0.0, end: 1.0).animate(controllerRotate),
+            child: Stack(children: [
+              Positioned.fill(
+                  child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 0, Colors.white, 150, 2))),
+              Positioned.fill(
+                  child:
+                      CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 20, Colors.white, 120, 1))),
+              Positioned.fill(
+                  child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 40, Colors.white, 90, 1))),
+              // Positioned.fill(
+              //     child: CustomPaint(painter: MyPainter(PathMorph.generatePath(_data), radius, 80, Colors.white, 60, 2))),
+            ]),
+          )),
+    );
   }
 }
 
@@ -196,7 +202,7 @@ class MyPainter extends CustomPainter {
       halfWidth = size.width / 2;
       halfHeight = (size.height / 2) - radius / 2;
     }
-    canvas.translate(halfWidth, halfHeight);
+    canvas.translate(halfWidth, halfHeight + (radius / 2));
     canvas.rotate(rndRotate);
     canvas.drawPath(path, myPaint);
   }
